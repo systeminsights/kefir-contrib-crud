@@ -1,0 +1,39 @@
+{
+  "name": "kefir-contrib-crud",
+  "version": "0.0.1",
+  "description": "Functions for working with streams of CRUD events",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepublish": "in-publish && (mkdir lib && coffee -cbo lib src) || in-install",
+    "postpublish": "rm -rf lib",
+    "test": "mocha --no-colors test/**/*-spec.coffee",
+    "watch": "mocha --no-colors --watch test/**/*-spec.coffee"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/systeminsights/kefir-contrib-crud"
+  },
+  "keywords": [],
+  "author": "System Insights",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/systeminsights/kefir-contrib-crud/issues"
+  },
+  "homepage": "https://github.com/systeminsights/kefir-contrib-crud",
+  "devDependencies": {
+    "chai": "^2.1.1",
+    "chai-as-promised": "^4.3.0",
+    "chai-immutable": "^0.2.1",
+    "coffee-script": "^1.9.1",
+    "fantasy-tuples": "0.0.1",
+    "immutable": "^3.6.4",
+    "in-publish": "^1.1.1",
+    "kefir-contrib": "0.0.1",
+    "mocha": "^2.1.0"
+  },
+  "dependencies": {
+    "daggy": "0.0.1",
+    "kefir": "^1.1.0",
+    "ramda": "^0.11.0"
+  }
+}
