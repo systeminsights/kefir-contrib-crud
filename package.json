@@ -28,7 +28,7 @@
     "fantasy-tuples": "0.0.1",
     "immutable": "^3.6.4",
     "in-publish": "^1.1.1",
-    "kefir-contrib": "0.0.1",
+    "kefir-contrib-run": "0.0.3",
     "mocha": "^2.1.0"
   },
   "dependencies": {

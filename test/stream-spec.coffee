@@ -1,7 +1,7 @@
 R = require 'ramda'
 K = require 'kefir'
 {Tuple2} = require 'fantasy-tuples'
-{last, runLogValues} = require 'kefir-contrib'
+{last, runLogValues} = require 'kefir-contrib-run'
 {applyToFirst, applyToLatest, crud} = require '../src/index'
 {Create, Update, Delete} = crud.Crud
 
