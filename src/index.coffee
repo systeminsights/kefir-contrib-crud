@@ -25,7 +25,7 @@ emitDelete = (emitter) ->
 #
 # Continuously fold the crud stream with the given function, using the the first
 # `b` emitted from the stream of bs as the starting value. Both streams are
-# consumed in parallel, buffering Crud events until the first `b` is emitted.
+# consumed concurrently, buffering Crud events until the first `b` is emitted.
 #
 applyToFirst = R.curry((f, bs, cruds) ->
   firstB   = bs.take(1).map(R.map(Crud.Create))
