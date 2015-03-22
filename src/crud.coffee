@@ -12,22 +12,22 @@ Crud = D.taggedSum(
 #
 # Fold a Crud event to a value
 #
-fold = R.curry((create, update, remove, crud) ->
+fold = R.curry (create, update, remove, crud) ->
   crud.cata(
     Create: create
     Update: update
-    Delete: remove))
+    Delete: remove)
 
 # :: (b -> a -> b) -> (b -> a -> b) -> (b -> StringOrNumber -> b) -> b -> Crud a -> b
 #
 # Combine the Crud event with a starting value.
 #
-foldLeft = R.curry((create, update, remove, b0, crud) ->
-  fold(create(b0), update(b0), remove(b0), crud))
+foldLeft = R.curry (create, update, remove, b0, crud) ->
+  fold(create(b0), update(b0), remove(b0), crud)
 
 # :: (a -> StringOrNumber) -> a -> a -> Boolean
-eqById = (getId) -> R.curry((a, b) ->
-  getId(a) == getId(b))
+eqById = (getId) -> R.curry (a, b) ->
+  getId(a) == getId(b)
 
 # :: (a -> StringOrNumber) -> [a] -> Crud a -> [a]
 #
@@ -36,10 +36,11 @@ eqById = (getId) -> R.curry((a, b) ->
 #
 applyToArray = (getId) ->
   eq = eqById(getId)
+  insert  = (as) -> (a)  -> if R.find(eq(a), as) then as else R.append(a, as)
   replace = (as) -> (a)  -> R.append(a, R.reject(eq(a), as))
   remove  = (as) -> (id) -> R.reject(R.compose(R.eq(id), getId), as)
 
-  foldLeft(replace, replace, remove)
+  foldLeft(insert, replace, remove)
 
 # :: (a -> StringOrNumber) -> IList a -> Crud a -> IList a
 #
@@ -48,10 +49,11 @@ applyToArray = (getId) ->
 #
 applyToIList = (getId) ->
   eq = eqById(getId)
+  insert  = (as) -> (a)  -> if as.find(eq(a)) then as else as.push(a)
   replace = (as) -> (a)  -> as.filterNot(eq(a)).push(a)
   remove  = (as) -> (id) -> as.filterNot(R.compose(R.eq(id), getId))
 
-  foldLeft(replace, replace, remove)
+  foldLeft(insert, replace, remove)
 
 # :: (a -> StringOrNumber) -> IMap a -> Crud a -> IMap a
 #
@@ -59,10 +61,11 @@ applyToIList = (getId) ->
 # to an Immutable.Map, adding replacing or removing the value.
 #
 applyToIMap = (getId) ->
+  insert  = (as) -> (a)  -> as.set(getId(a), as.get(getId(a), a))
   replace = (as) -> (a)  -> as.set(getId(a), a)
   remove  = (as) -> (id) -> as.remove(id)
 
-  foldLeft(replace, replace, remove)
+  foldLeft(insert, replace, remove)
 
 module.exports = {Crud, fold, foldLeft, applyToArray, applyToIList, applyToIMap}
 

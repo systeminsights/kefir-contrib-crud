@@ -20,6 +20,11 @@ applyTests = (name, fromArray, toArray) ->
       ts = fromArray([t1, t2])
       expect(toMap(f(ts, Create(t4)))).to.deep.equal(arrayToMap([t1, t2, t4]))
 
+    it "should not add value on Create when previous exists", ->
+      ts = fromArray([t1, t2])
+      t1AA = Tuple2(1, "AA")
+      expect(toMap(f(ts, Create(t1AA)))).to.deep.equal(arrayToMap([t1, t2]))
+
     it "should replace value when applying Update and previous exists", ->
       ts  = fromArray([t1, t2, t3])
       t2x = Tuple2(2, "X")
