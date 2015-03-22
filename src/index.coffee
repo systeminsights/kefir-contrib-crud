@@ -7,19 +7,19 @@ Crud = crud.Crud
 #
 # Emit a Crud.Create to the stream
 emitCreate = (emitter) ->
-  R.compose(emitter.emit, Crud.Create)
+  R.compose(emitter.emit.bind(emitter), Crud.Create)
 
 # :: Kefir.Emitter (Crud a) -> (a -> ())
 #
 # Emit a Crud.Update to the stream
 emitUpdate = (emitter) ->
-  R.compose(emitter.emit, Crud.Update)
+  R.compose(emitter.emit.bind(emitter), Crud.Update)
 
 # :: Kefir.Emitter (Crud a) -> (String -> ())
 #
 # Emit a Crud.Delete to the stream
 emitDelete = (emitter) ->
-  R.compose(emitter.emit, Crud.Delete)
+  R.compose(emitter.emit.bind(emitter), Crud.Delete)
 
 # :: (b -> Crud a -> b) -> Kefir e b -> Kefir e (Crud a) -> Kefir e b
 #
