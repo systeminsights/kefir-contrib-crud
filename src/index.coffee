@@ -21,26 +21,37 @@ emitUpdate = (emitter) ->
 emitDelete = (emitter) ->
   R.compose(emitter.emit.bind(emitter), Crud.Delete)
 
-# :: (b -> Crud a -> b) -> Kefir e b -> Kefir e (Crud a) -> Kefir e b
+# :: ([x] -> f x) ->
+#    (x -> f x) ->
+#    ((x -> y) -> f x -> f y) ->
+#    f a ->
+#    (f a -> f (Crud a) -> f a) ->
+#    Kefir e (f a) ->
+#    Kefir e (Crud a) ->
+#    Kefir e (f a)
 #
 # Continuously fold the crud stream with the given function, using the the first
-# `b` emitted from the stream of bs as the starting value. Both streams are
-# consumed concurrently, buffering Crud events until the first `b` is emitted.
+# `fa` emitted from the stream of fas as the starting value. Both streams are
+# consumed concurrently, buffering Crud events until the first `fa` is emitted.
 #
-applyToFirst = R.curry((f, bs, cruds) ->
-  firstB   = bs.take(1).map(R.map(Crud.Create))
-  buffered = cruds.bufferBy(firstB).take(1)
-  skipped  = cruds.skipUntilBy(firstB).map(R.of)
+applyToFirst = R.curry (fromArray, point, map, empty, f, fas, cruds) ->
+  firstFa  = fas.take(1).map(map(Crud.Create))
+  buffered = cruds.bufferBy(firstFa).take(1).map(fromArray)
+  skipped  = cruds.skipUntilBy(firstFa).map(point)
 
-  K.merge([firstB, buffered, skipped]).scan(R.reduce(f), []))
+  K.merge([firstFa, buffered, skipped]).scan(f, empty)
+
+# :: ([a] -> Crud a -> [a]) -> Kefir e [a] -> Kefir e (Crud a) -> Kefir e [a]
+arrayApplyToFirst = R.curry (f, as, cruds) ->
+  applyToFirst(R.identity, R.of, R.map, [], R.reduce(f), as, cruds)
 
 # :: (b -> Crud a -> b) -> Kefir e b -> Kefir e (Crud a) -> Kefir e b
 #
 # Fold the crud stream using the latest `b` emitted as the starting value,
 # restarting whenever a new `b` is emitted.
 #
-applyToLatest = R.curry((f, bs, cruds) ->
-  bs.flatMapLatest((b) -> cruds.scan(f, b)))
+applyToLatest = R.curry (f, bs, cruds) ->
+  bs.flatMapLatest((b) -> cruds.scan(f, b))
 
-module.exports = {crud, emitCreate, emitUpdate, emitDelete, applyToFirst, applyToLatest}
+module.exports = {crud, emitCreate, emitUpdate, emitDelete, arrayApplyToFirst, applyToFirst, applyToLatest}
 

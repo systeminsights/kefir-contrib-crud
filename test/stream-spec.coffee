@@ -18,29 +18,30 @@ expectedFinal = [t2, t3, Tuple2(1, "AA"), Tuple2(4, "CC")]
 
 # TODO: Add to contrib
 getOrElse = (x) -> (o) -> o.getOrElse(x)
+applyToFirstA = applyToFirst(R.identity, R.of, R.map, [], R.reduce(fold))
 
 describe "applyToFirst", ->
   it "should buffer crud events, applying once `b` is emitted", ->
     crudStream = K.sequentially(50, cruds)
     bStream = K.sequentially(117, bs)
-    applied = applyToFirst(fold, bStream, crudStream)
+    applied = applyToFirstA(bStream, crudStream)
 
     expect(last(applied).then(getOrElse([]))).to.become(expectedFinal)
 
   it "should apply crud events when they occur after `b`", ->
     crudStream = K.sequentially(100, cruds)
     bStream = K.sequentially(10, bs)
-    applied = applyToFirst(fold, bStream, crudStream)
+    applied = applyToFirstA(bStream, crudStream)
 
     expect(last(applied).then(getOrElse([]))).to.become(expectedFinal)
 
   it "should be the result of applying crud events to an empty array when bs never emits", ->
-    applied = applyToFirst(fold, K.never(), K.sequentially(50, cruds))
+    applied = applyToFirstA(K.never(), K.sequentially(50, cruds))
 
     expect(last(applied).then(getOrElse([]))).to.become(R.drop(2, expectedFinal))
 
   it "should be the first bs when crud stream never emits", ->
-    applied = applyToFirst(fold, K.sequentially(50, bs), K.never())
+    applied = applyToFirstA(K.sequentially(50, bs), K.never())
 
     expect(last(applied).then(getOrElse([]))).to.become(bs[0])
 
