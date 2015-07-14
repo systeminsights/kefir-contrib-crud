@@ -21,8 +21,8 @@ emitUpdate = (emitter) ->
 emitDelete = (emitter) ->
   R.compose(emitter.emit.bind(emitter), Crud.Delete)
 
-# :: ([x] -> f x) ->
-#    (x -> f x) ->
+# :: ([Crud a] -> f (Crud a)) ->
+#    (Crud a -> f (Crud a)) ->
 #    ((x -> y) -> f x -> f y) ->
 #    f a ->
 #    (f a -> f (Crud a) -> f a) ->
@@ -36,10 +36,10 @@ emitDelete = (emitter) ->
 #
 applyToFirst = R.curry (fromArray, point, map, empty, f, fas, cruds) ->
   firstFa  = fas.take(1).map(map(Crud.Create))
-  buffered = cruds.bufferBy(firstFa).take(1).map(fromArray)
+  buffered = cruds.bufferBy(firstFa, flushOnEnd: false).take(1).map(fromArray)
   skipped  = cruds.skipUntilBy(firstFa).map(point)
 
-  K.merge([firstFa, buffered, skipped]).scan(f, empty)
+  K.merge([firstFa, buffered, skipped]).scan(f, empty).changes()
 
 # :: ([a] -> Crud a -> [a]) -> Kefir e [a] -> Kefir e (Crud a) -> Kefir e [a]
 arrayApplyToFirst = R.curry (f, as, cruds) ->

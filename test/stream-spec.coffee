@@ -35,10 +35,10 @@ describe "applyToFirst", ->
 
     expect(last(applied).then(getOrElse([]))).to.become(expectedFinal)
 
-  it "should be the result of applying crud events to an empty array when bs never emits", ->
+  it "should end when bs ends before emitting", ->
     applied = applyToFirstA(K.never(), K.sequentially(50, cruds))
 
-    expect(last(applied).then(getOrElse([]))).to.become(R.drop(2, expectedFinal))
+    expect(last(applied).then(getOrElse("novalue"))).to.become("novalue")
 
   it "should be the first bs when crud stream never emits", ->
     applied = applyToFirstA(K.sequentially(50, bs), K.never())
